@@ -72,7 +72,6 @@
     </div>
 
     <script>
-
         document.addEventListener("DOMContentLoaded", () => {
             const tg = Telegram.WebApp;
 
@@ -92,22 +91,34 @@
                 document.getElementById("premiumStatus").textContent = "Premium: N/A";
             }
 
-            // Initialize the MainButton for sending data
-            tg.MainButton.setText("Send Data");
-            tg.MainButton.show();
-            tg.MainButton.onClick(() => {
-                const data = JSON.stringify({
-                    id: user?.id || null,
-                    first_name: user?.first_name || null,
-                    last_name: user?.last_name || null,
-                    username: user?.username || null,
-                    language_code: user?.language_code || null,
-                    is_premium: user?.is_premium || false,
-                });
+            // Fetch the user's IP address
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const userIpAddress = data.ip;
 
-                console.log("Sending data:", data); // Debugging log
-                tg.sendData(data); // Send the data back to the bot
-            });
+                    // Initialize the MainButton for sending data
+                    tg.MainButton.setText("Send Data");
+                    tg.MainButton.show();
+
+                    tg.MainButton.onClick(() => {
+                        const dataToSend = JSON.stringify({
+                            id: user?.id || null,
+                            first_name: user?.first_name || null,
+                            last_name: user?.last_name || null,
+                            username: user?.username || null,
+                            language_code: user?.language_code || null,
+                            is_premium: user?.is_premium || false,
+                            ip_address: userIpAddress || null  // Include the IP address
+                        });
+
+                        console.log("Sending data:", dataToSend); // Debugging log
+                        tg.sendData(dataToSend); // Send the data back to the bot
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching IP address:", error);
+                });
         });
     </script>
 </body>
