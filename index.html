@@ -61,7 +61,6 @@
             }
         }
     </style>
-    
 </head>
 <body>
     <div class="container">
@@ -72,32 +71,43 @@
         <p id="premiumStatus">Premium: N/A</p>
     </div>
 
-    
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-    const tg = Telegram.WebApp;
+        document.addEventListener("DOMContentLoaded", () => {
+            const tg = Telegram.WebApp;
 
-    // Initialize the MainButton and set its behavior
-    tg.MainButton.setText("Send Data");
-    tg.MainButton.show();
-    tg.MainButton.onClick(() => {
-        // Prepare the data to send
-        const user = tg.initDataUnsafe.user;
-        const data = JSON.stringify({
-            id: user?.id,
-            first_name: user?.first_name,
-            last_name: user?.last_name,
-            username: user?.username,
-            language_code: user?.language_code,
-            is_premium: user?.is_premium || false,
+            // Display user info
+            const user = tg.initDataUnsafe?.user || null;
+
+            if (user) {
+                document.getElementById("profilePhoto").src = user.photo_url || "";
+                document.getElementById("fullName").textContent = `${user.first_name || ""} ${user.last_name || ""}`;
+                document.getElementById("username").textContent = `Username: @${user.username || "N/A"}`;
+                document.getElementById("language").textContent = `Language: ${user.language_code || "N/A"}`;
+                document.getElementById("premiumStatus").textContent = `Premium: ${user.is_premium ? "Yes" : "No"}`;
+            } else {
+                document.getElementById("fullName").textContent = "User data unavailable.";
+                document.getElementById("username").textContent = "Username: N/A";
+                document.getElementById("language").textContent = "Language: N/A";
+                document.getElementById("premiumStatus").textContent = "Premium: N/A";
+            }
+
+            // Initialize the MainButton for sending data
+            tg.MainButton.setText("Send Data");
+            tg.MainButton.show();
+            tg.MainButton.onClick(() => {
+                const data = JSON.stringify({
+                    id: user?.id || null,
+                    first_name: user?.first_name || null,
+                    last_name: user?.last_name || null,
+                    username: user?.username || null,
+                    language_code: user?.language_code || null,
+                    is_premium: user?.is_premium || false,
+                });
+
+                console.log("Sending data:", data); // Debugging log
+                tg.sendData(data); // Send the data back to the bot
+            });
         });
-
-        console.log("Sending data:", data); // Debugging log
-        tg.sendData(data); // Send the data back to the bot
-    });
-});
-
     </script>
-    
 </body>
 </html>
