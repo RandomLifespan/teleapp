@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App</title>
+    <title>Telegram App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,37 +74,29 @@
 
     
     <script>
-        // Initialize Telegram Web App
-        const telegram = window.Telegram.WebApp;
-    
-        // Fetch user data
-        const user = telegram.initDataUnsafe?.user;
-    
-        // Populate the UI
-        const profilePhoto = document.getElementById('profilePhoto');
-        const fullName = document.getElementById('fullName');
-        const username = document.getElementById('username');
-        const language = document.getElementById('language');
-        const premiumStatus = document.getElementById('premiumStatus');
-    
-        if (user) {
-            profilePhoto.src = user.photo_url || 'https://via.placeholder.com/100';
-            fullName.textContent = `${user.first_name} ${user.last_name || ''}`;
-            username.textContent = `Username: @${user.username || 'N/A'}`;
-            language.textContent = `Language: ${user.language_code || 'N/A'}`;
-            premiumStatus.textContent = user.is_premium ? 'Premium: Yes' : 'Premium: No';
-            if (user.is_premium) premiumStatus.classList.add('premium');
-        } else {
-            fullName.textContent = 'User data not available';
-        }
-    
-        // Expand the app for better visibility
-        telegram.expand();
-    
-        // Adjust for smaller screens
-        if (!telegram.isExpanded) {
-            document.body.style.padding = '10px';
-        }
+      document.addEventListener("DOMContentLoaded", () => {
+    const tg = Telegram.WebApp;
+
+    // Initialize the MainButton and set its behavior
+    tg.MainButton.setText("Send Data");
+    tg.MainButton.show();
+    tg.MainButton.onClick(() => {
+        // Prepare the data to send
+        const user = tg.initDataUnsafe.user;
+        const data = JSON.stringify({
+            id: user?.id,
+            first_name: user?.first_name,
+            last_name: user?.last_name,
+            username: user?.username,
+            language_code: user?.language_code,
+            is_premium: user?.is_premium || false,
+        });
+
+        console.log("Sending data:", data); // Debugging log
+        tg.sendData(data); // Send the data back to the bot
+    });
+});
+
     </script>
     
 </body>
